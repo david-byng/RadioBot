@@ -51,7 +51,7 @@ couchdb:
 	    if [ `curl --silent -X GET http://${HOSTNAME}:${COUCHPORT}/_all_dbs | grep "radiobot" | wc -l | tr -d " \n"` -eq 0 ]; \
 	    then \
 	        echo "Creating database..."; \
-	        curl --silent -X PUT http://admin:${PASSWORD}@localhost:${COUCHPORT}/radiobot; \
+	        curl --silent -X PUT http://admin:${PASSWORD}@${HOSTNAME}:${COUCHPORT}/radiobot; \
 	    fi; \
 	else \
 	    echo "Couchdb already running."; \
