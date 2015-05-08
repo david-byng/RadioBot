@@ -2,6 +2,7 @@ PASSWORD=swordfish
 DIR=$(shell pwd)
 NGINXPORT=8064
 COUCHPORT=5984
+HOSTNAME=localhost
 
 default: install start
 
@@ -12,8 +13,8 @@ install:
 start: gulp nginx couchdb
 	@echo; \
     echo "By default:"; \
-    echo "Nginx is hosted on http://localhost:${NGINXPORT}"; \
-    echo "Couch is hosted on http://localhost:${COUCHPORT}"; \
+    echo "Nginx is hosted on http://${HOSTNAME}:${NGINXPORT}"; \
+    echo "Couch is hosted on http://${HOSTNAME}:${COUCHPORT}"; \
     echo "Couch user is 'admin', password is '${PASSWORD}'";
 
 gulp:
@@ -36,18 +37,18 @@ couchdb:
 	    echo "Starting couchdb..." && \
 	    docker run -d -p ${COUCHPORT}:5984 -v ${DIR}/data/couchdb:/usr/local/var/lib/couchdb --name radiobotcouchdb klaemo/couchdb && \
 	    echo -n "Waiting for couch to start..." && \
-	    until curl --silent -X GET http://localhost:${COUCHPORT}/_all_dbs > /dev/null; do echo -n "."; sleep 0.5; done; \
+	    until curl --silent -X GET http://${HOSTNAME}:${COUCHPORT}/_all_dbs > /dev/null; do echo -n "."; sleep 0.5; done; \
         echo; \
-        curl --silent -X GET http://localhost:${COUCHPORT}/_all_dbs; \
+        curl --silent -X GET http://${HOSTNAME}:${COUCHPORT}/_all_dbs; \
 	    echo; \
 	    echo "Checking for admin user..."; \
-	    if [ `curl --silent -X GET http://localhost:${COUCHPORT}/_config/admin | grep "unauthorized" | wc -l | tr -d " \n"` -lt 1 ]; \
+	    if [ `curl --silent -X GET http://${HOSTNAME}:${COUCHPORT}/_config/admin | grep "unauthorized" | wc -l | tr -d " \n"` -lt 1 ]; \
 	    then \
 	        echo "Creating admin user..."; \
-	        curl --silent -X PUT http://localhost:${COUCHPORT}/_config/admins/admin -d '"${PASSWORD}"'; \
+	        curl --silent -X PUT http://${HOSTNAME}:${COUCHPORT}/_config/admins/admin -d '"${PASSWORD}"'; \
 	    fi; \
 	    echo "Checking for database..." && \
-	    if [ `curl --silent -X GET http://localhost:${COUCHPORT}/_all_dbs | grep "radiobot" | wc -l | tr -d " \n"` -eq 0 ]; \
+	    if [ `curl --silent -X GET http://${HOSTNAME}:${COUCHPORT}/_all_dbs | grep "radiobot" | wc -l | tr -d " \n"` -eq 0 ]; \
 	    then \
 	        echo "Creating database..."; \
 	        curl --silent -X PUT http://admin:${PASSWORD}@localhost:${COUCHPORT}/radiobot; \
