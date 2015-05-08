@@ -3,7 +3,11 @@ DIR=$(shell pwd)
 NGINXPORT=8064
 COUCHPORT=5984
 
-default: start
+default: install start
+
+install:
+	@npm install; \
+	${DIR}/node_modules/bower/bin/bower install;
 
 start: gulp nginx couchdb
 	@echo; \

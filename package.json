@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/david-byng/radiobot/issues"
   },
-  "homepage": "https://github.com/david-byng/radiobot"
+  "homepage": "https://github.com/david-byng/radiobot",
+  "dependencies": {
+    "bower": "^1.4.1"
+  }
 }
