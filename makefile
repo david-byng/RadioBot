@@ -2,7 +2,7 @@ PASSWORD=swordfish
 DIR=$(shell pwd)
 NGINXPORT=8064
 COUCHPORT=5984
-HOSTNAME=localhost
+HOSTNAME=$(shell if hash boot2docker 2>/dev/null; then boot2docker ip; else echo "localhost"; fi)
 
 default: install start
 
@@ -10,7 +10,9 @@ install:
 	@npm install; \
 	${DIR}/node_modules/bower/bin/bower install;
 
-start: gulp nginx couchdb
+start: gulp nginx couchdb useage
+
+useage:
 	@echo; \
     echo "By default:"; \
     echo "Nginx is hosted on http://${HOSTNAME}:${NGINXPORT}"; \
