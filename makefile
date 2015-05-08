@@ -10,7 +10,7 @@ install:
 	@npm install; \
 	${DIR}/node_modules/bower/bin/bower install;
 
-start: gulp nginx couchdb useage
+start: gulp couchdb nginx useage
 
 useage:
 	@echo; \
@@ -22,12 +22,24 @@ useage:
 gulp:
 	@echo -n ""; # noop
 
+clean-nginx:
+	@echo "Stopping nginx.."; \
+    docker stop radiobotnginx >/dev/null; \
+    echo "Removing nginx.."; \
+	docker rm radiobotnginx >/dev/null; 
+
+clean-couch:
+	@echo "Stopping couchdb.."; \
+	docker stop radiobotcouchdb >/dev/null; \
+    echo "Removing couchdb.."; \
+	docker rm radiobotcouchdb >/dev/null; 
+
 nginx:
 	@echo "Checking for nginx..." && \
 	if [ `docker ps | grep radiobotnginx | wc -l | tr -d " \n"` -eq 0 ]; \
 	then \
 	    echo "Starting nginx..." && \
-	    docker run -d -p ${NGINXPORT}:80 -v ${DIR}/www:/usr/share/nginx/html:ro --name radiobotnginx nginx; \
+	    docker run -d -p ${NGINXPORT}:80 --link radiobotcouchdb:couch -v ${DIR}/www:/usr/share/nginx/html:ro -v ${DIR}/config/default.conf:/etc/nginx/conf.d/default.conf:ro --name radiobotnginx nginx; \
 	else \
 	    echo "Nginx already running."; \
 	fi;
@@ -37,7 +49,7 @@ couchdb:
 	if [ `docker ps | grep radiobotcouchdb | wc -l | tr -d " \n"` -eq 0 ]; \
 	then \
 	    echo "Starting couchdb..." && \
-	    docker run -d -p ${COUCHPORT}:5984 -v ${DIR}/data/couchdb:/usr/local/var/lib/couchdb --name radiobotcouchdb klaemo/couchdb && \
+	    docker run -d -v ${DIR}/data/couchdb:/usr/local/var/lib/couchdb --name radiobotcouchdb klaemo/couchdb && \
 	    echo -n "Waiting for couch to start..." && \
 	    until curl --silent -X GET http://${HOSTNAME}:${COUCHPORT}/_all_dbs > /dev/null; do echo -n "."; sleep 0.5; done; \
         echo; \
@@ -59,14 +71,6 @@ couchdb:
 	    echo "Couchdb already running."; \
 	fi;
 
-clean:
-	@echo "Stopping nginx.."; \
-    docker stop radiobotnginx >/dev/null; \
-    echo "Removing nginx.."; \
-	docker rm radiobotnginx >/dev/null; \
-    echo "Stopping couchdb.."; \
-	docker stop radiobotcouchdb >/dev/null; \
-    echo "Removing couchdb.."; \
-	docker rm radiobotcouchdb >/dev/null; \
-    echo "Removing data.."; \
-	rm -rvf ./data/couchdb/*; \
+clean: clean-nginx clean-couch
+	@echo "Removing data.."; \
+	rm -rvf ./data/couchdb/*; 
