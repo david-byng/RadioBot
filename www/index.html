@@ -17,7 +17,7 @@
             <form ng-submit="addTrack()">
                 <input type="text" ng-model="newtrack" />
                 <button type="submit">Add track</button>
-                Type: {{ classifyurl(newtrack) }}
+                Type: {{ classifyurl(newtrack) }} ID: {{ extractid(newtrack) }} Title: {{ videotitle }}
             </form>
         </div>
     </body>
