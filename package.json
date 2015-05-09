@@ -19,7 +19,6 @@
   "dependencies": {
     "bower": "^1.4.1",
     "gulp": "^3.8.11",
-    "gulp-cached": "^1.1.0",
     "gulp-concat": "^2.5.2",
     "gulp-jshint": "^1.10.0",
     "gulp-watch": "^4.2.4"
