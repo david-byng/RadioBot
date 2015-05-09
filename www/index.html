@@ -1,11 +1,24 @@
 <html>
     <head>
         <title>Radio Bot</title>
-        <script src="lib/angular/angular.min.js.gzip"></script>
+        <script src="lib/angular/angular.min.js"></script>
         <script src="lib/jquery/dist/jquery.min.js"></script>
+        <script src="lib/CornerCouch/angular-cornercouch.js"></script>
         <script src="compiled/radiobot.js"></script>
     </head>
-    <body>
+    <body ng-app="radiobot">
         <h1> BYNG RADIO </h1>
+        <div id="admin" ng-controller="AdminCtrl">
+            <ol>
+                <li ng-repeat="track in tracks">
+                    {{ track | json }}
+                </li>
+            </ol>
+            <form ng-submit="addTrack()">
+                <input type="text" ng-model="newtrack" />
+                <button type="submit">Add track</button>
+                Type: {{ classifyurl(newtrack) }}
+            </form>
+        </div>
     </body>
 </html>
