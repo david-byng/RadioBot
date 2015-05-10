@@ -23,38 +23,41 @@ angular.module(
                                 a :
                                 b
                         );
-                    });
+                    }, []);
+
+                var next = [];
 
                 function pickNext() {
                     var myTracks = tracks.sort(function(a,b) {
                         var aScore = (
-                            a.upvotes.length -
-                            a.downvotes.length -
+                            (a.upvotes || []).length -
+                            (a.downvotes || []).length -
                             (
-                                a.plays + next.filter(function(x) {
-                                    return x === a;
-                                })
+                                (a.plays || 0) + next.filter(function(x) {
+                                    return x.value === a;
+                                }).length
                             )
                         );
                         var bScore = (
-                            b.upvotes.length -
-                            b.downvotes.length -
+                            (b.upvotes || []).length -
+                            (b.downvotes || [] ).length -
                             (
-                                a.plays + next.filter(function(x) {
-                                    return x === a;
-                                })
+                                (b.plays || 0) + next.filter(function(x) {
+                                    return x.value === b;
+                                }).length
                             )
                         );
-                        return aScore - bScore;
+                        console.log(aScore, a.title);
+                        return bScore - aScore;
                     });
-
+                    return myTracks[0];
                 }
 
-                var next = [];
 
                 while (next.length < number) {
-                    next.push(pickNext());
+                    next.push({value: pickNext()});
                 }
+                console.log("result", next);
 
                 return next;
             };

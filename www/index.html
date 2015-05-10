@@ -63,18 +63,7 @@
                     </span>
                 </a>
                 <ol type="1">
-                    <li>Moving Ninja - Track Title</li>
-                    <li>Moving Ninja - Track Title</li>
-                    <li>Moving Ninja - Track Title</li>
-                    <li>Moving Ninja - Track Title</li>
-                    <li>Moving Ninja - Track Title</li>
-                    <li>Moving Ninja - Track Title</li>
-                    <li>Moving Ninja - Track Title</li>
-                    <li>Moving Ninja - Track Title</li>
-                    <li>Moving Ninja - Track Title</li>
-                    <li>Moving Ninja - Track Title</li>
-                    <li>Moving Ninja - Track Title</li>
-                    <li>Moving Ninja - Track Title</li>
+                    <li ng-repeat="item in playlist(10)">{{ item.value.title }}</li>
                 </ol>
                 <div class="controls">
                     <a href="#" class="scrollup"></a>
