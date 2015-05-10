@@ -19,13 +19,17 @@ angular.module("radiobot.service.youtube", [])
             this.gettingInfo = function(url) {
                 return $http.get(YOUTUBE_API + "/videos", {
                     params: {
-                        part: "snippet",
+                        part: "snippet,contentDetails,topicDetails",
                         id: this.extractKey(url),
                         key: apikey
                     }
                 })
                     .then(function(response) {
-                        return response.data.items[0].snippet;
+                        return {
+                            snippet: response.data.items[0].snippet,
+                            contentDetails: response.data.items[0].contentDetails,
+                            topicDetails: response.data.items[0].topicDetails
+                        };
                     });
             };
         }

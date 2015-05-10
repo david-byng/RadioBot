@@ -53,6 +53,7 @@ angular.module(
                         $scope.lastSeq = response.data.last_seq;
                     })
                     .then($scope.refresh)
+
                     .then(poll);
             }
             poll();
@@ -85,7 +86,25 @@ angular.module(
                 doc.upvotes = [];
                 youtube.gettingInfo($scope.newtrack)
                     .then(function(response) {
-                        doc.title = response.title;
+                        doc.title = response.snipet.title;
+                        var duration = response.contentDetails.duration.replace("PT", "");
+                        doc.length = response.contentDetails
+                            .duration
+                            .replace("PT", "")
+                            .match(/([0-9]+[HMS])/g)
+                            .map(function(part) {
+                                var multipliers = {
+                                        H: 3600,
+                                        M: 60,
+                                        S: 1
+                                    };
+                                var multiplier = multipliers[part.replace(/[0-9]/g, "")];
+                                return parseInt(part, 10) * multiplier;
+                            })
+                            .reduce(function(a, b) {
+                                return a + b;
+                            });
+                        doc.youtubeTopicDetails = response.topicDetails;
                         doc.save();
                     });
             };
