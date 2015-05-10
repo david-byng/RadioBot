@@ -4,7 +4,8 @@ angular.module(
         "CornerCouch",
         "radiobot.constants",
         "radiobot.service.youtube",
-        "radiobot.service.db"
+        "radiobot.service.db",
+        "radiobot.filter.not-deleted"
     ]
 )
     .controller(
@@ -16,7 +17,6 @@ angular.module(
         ){
             var youtube = new YoutubeService(API_KEY_YOUTUBE);
             $scope.DBService = DBService;
-            console.log(youtube);
             $scope.db = DBService;
 
             $scope.username = localStorage.getItem("username") || "Guest";
@@ -33,7 +33,7 @@ angular.module(
                 if ($scope.newtrack) {
                     youtube.gettingInfo($scope.newtrack)
                         .then(function(response) {
-                            $scope.videotitle = response.title;
+                            $scope.videotitle = response.snippet.title;
                         });
                 }
             });
@@ -46,7 +46,7 @@ angular.module(
 
                 var videoid = $scope.extractid($scope.newtrack);
 
-                if ($scope.tracks.filter(function(track) { return track.trackid === videoid; }).length > 0) {
+                if ($scope.db.rows.filter(function(track) { return track.trackid === videoid; }).length > 0) {
                     alert("Sorry\nYou've already added this track");
                     return false;
                 }
@@ -59,7 +59,7 @@ angular.module(
                 doc.upvotes = [];
                 youtube.gettingInfo($scope.newtrack)
                     .then(function(response) {
-                        doc.title = response.snipet.title;
+                        doc.title = response.snippet.title;
                         var duration = response.contentDetails.duration.replace("PT", "");
                         doc.length = response.contentDetails
                             .duration
@@ -77,9 +77,14 @@ angular.module(
                             .reduce(function(a, b) {
                                 return a + b;
                             });
-                        doc.youtubeTopicDetails = response.topicDetails;
-                        doc.save();
+                        doc.youtubeInfo = response;
+                        $scope.db.save(doc);
                     });
+            };
+
+            $scope.removeTrack = function(track) {
+                track._deleted = true;
+                $scope.db.save(track);
             };
 
             $scope.extractid = function(url) {

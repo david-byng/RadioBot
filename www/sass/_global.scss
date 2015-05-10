@@ -11,11 +11,15 @@ body {
     @include clearfix;
 }
 
-#media {
+#media, #admin {
     @include span-columns(8);
 
     position: relative;
     left: 30px;
+
+    &.hide {
+        display: none;
+    }
 
     header {
         @include clearfix;

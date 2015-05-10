@@ -13,7 +13,7 @@ install: prereqs
 	@echo -n "Installing node dependencies..."; \
 	npm install && \
 	echo "OK"; \
-	echo -n "Installing bower dependencies...";
+	echo -n "Installing bower dependencies..."; \
 	${DIR}/node_modules/bower/bin/bower install && \
 	echo "OK";
 
@@ -78,7 +78,7 @@ gulp:
 
 couchdb: couchdb-start nginx
 	@echo -n "Waiting for couch to start..."; \
-	until curl --silent -X GET http://${HOSTNAME}:${NGINXPORT}/couchdb/_all_dbs > /dev/null; do echo -n "."; sleep 0.5; done; \
+	until curl --silent -X GET http://${HOSTNAME}:${NGINXPORT}/couchdb/ | grep -q "Apache"; do echo -n "."; sleep 0.5; done; \
 	echo; \
 	echo "Checking for admin user..."; \
 	if ! curl --silent -X GET http://${HOSTNAME}:${NGINXPORT}/couchdb/_config/admin | grep -q "unauthorized"; \

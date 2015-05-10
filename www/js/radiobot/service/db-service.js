@@ -1,4 +1,4 @@
-angular.module("radiobot.service.db", [ "CornerCouch" ])
+angular.module("radiobot.service.db", [])
     .service(
         "DBService",
         function DBService(
@@ -9,22 +9,22 @@ angular.module("radiobot.service.db", [ "CornerCouch" ])
             var that = this;
 
             this.rows = [];
-            var db = cornercouch(COUCH_MOUNT, "GET").getDB(COUCH_DB);
             var documents = {};
             var lastSeq = 0;
 
             function poll() {
                 $http.get(COUCH_MOUNT + "/" + COUCH_DB + "/_changes?feed=longpoll&include_docs=true&since=" + lastSeq)
                     .then(function(response) {
-                        console.log("WARK", response);
                         lastSeq = response.data.last_seq;
                         response.data.results
                             .forEach(function(result) {
                                 processResult(result.doc);
                             });
+
+                        dedupe();
+                        removeDeleted();
                     })
-                    .then(dedupe)
-                    .then(poll);
+                    .finally(poll);
             }
             poll();
 
@@ -54,15 +54,9 @@ angular.module("radiobot.service.db", [ "CornerCouch" ])
                         curDoc[key] = result[key];
                     });
 
-                console.log("Rows", that.rows);
-
                 // Push new copy into the array
                 // copy used so we can tell if it has been updated
                 documents[curDoc._id] = JSON.stringify(curDoc);
-            }.bind(this);
-
-            var documentsEqual = function(a, b) {
-                return JSON.stringify(a) === JSON.stringify(b);
             }.bind(this);
 
             this.saveAll = function() {
@@ -96,6 +90,16 @@ angular.module("radiobot.service.db", [ "CornerCouch" ])
 
             }.bind(this);
 
+            var removeDeleted = function() {
+                that.rows
+                    .filter(function(row) {
+                        return !!row._deleted;
+                    })
+                    .forEach(function(row) {
+                        that.rows.splice(that.rows.indexOf(row), 1);
+                    });
+            }.bind(this);
+
             this.save = function(doc) {
                 if (typeof doc !== "object") {
                     throw "DBService.save expects a document object to save. Did you mean 'saveAll'?";
@@ -117,7 +121,8 @@ angular.module("radiobot.service.db", [ "CornerCouch" ])
                         doc._id = response.data.id;
                         doc._rev = response.data.rev;
                     })
-                    .then(dedupe);
+                    .then(dedupe)
+                    .then(removeDeleted);
             };
 
             return this;

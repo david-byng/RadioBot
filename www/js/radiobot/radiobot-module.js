@@ -2,7 +2,8 @@ angular.module(
     "radiobot",
     [
         "radiobot.module.player",
-        "radiobot.module.admin"
+        "radiobot.module.admin",
+        "radiobot.controller.bot"
     ]
 )
     .run(function() {

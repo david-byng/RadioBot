@@ -31,13 +31,14 @@ gulp.task("watch", function() {
     var watch = require("gulp-watch");
 
     gulp.start("scripts");
+    gulp.start("sass");
 
     watch(paths.js, function() {
         gulp.start("scripts");
     });
 
     watch("www/sass/**/*", function() {
-        gulp.start("build-css");
+        gulp.start("sass");
     });
 
 });
