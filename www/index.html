@@ -10,7 +10,7 @@
         <h1> BYNG RADIO </h1>
         <div id="admin" ng-controller="AdminCtrl">
             <ol>
-                <li ng-repeat="track in tracks">
+                <li ng-repeat="track in db.rows | filter:{type: 'track', user: username}">
                     {{ track | json }}
                 </li>
             </ol>
